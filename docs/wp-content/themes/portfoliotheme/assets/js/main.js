@@ -273,6 +273,52 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+  document.querySelectorAll('.php-email-form[action*="formsubmit.co/"]').forEach(form => {
+    const loadingMessage = form.querySelector('.loading');
+    const errorMessage = form.querySelector('.error-message');
+    const sentMessage = form.querySelector('.sent-message');
+    const submitButton = form.querySelector('[type="submit"]');
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (submitButton.disabled) return;
+
+      const endpoint = new URL(form.action);
+      endpoint.pathname = `/ajax${endpoint.pathname}`;
+      loadingMessage.classList.add('d-block');
+      errorMessage.classList.remove('d-block');
+      sentMessage.classList.remove('d-block');
+      submitButton.disabled = true;
+      form.setAttribute('aria-busy', 'true');
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(Object.fromEntries(new FormData(form)))
+        });
+        const result = await response.json();
+
+        if (!response.ok || (result.success !== true && result.success !== 'true')) {
+          throw new Error(result.message || 'Your message could not be sent. Please try again.');
+        }
+
+        form.reset();
+        sentMessage.classList.add('d-block');
+      } catch (error) {
+        errorMessage.textContent = error.message || 'Your message could not be sent. Please try again.';
+        errorMessage.classList.add('d-block');
+      } finally {
+        loadingMessage.classList.remove('d-block');
+        submitButton.disabled = false;
+        form.removeAttribute('aria-busy');
+      }
+    });
+  });
+
   if (new URLSearchParams(window.location.search).get('contact_status') === 'success') {
     document.querySelector('#contact-form-success')?.classList.remove('d-none');
   }

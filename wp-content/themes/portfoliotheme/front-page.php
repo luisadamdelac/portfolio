@@ -480,6 +480,7 @@ $skills = [
                 <input type="hidden" name="_subject" value="New portfolio contact message">
                 <input type="hidden" name="_next" value="https://luisadamdelac.github.io/portfolio/?contact_status=success#contact-form-success">
                 <input type="hidden" name="_template" value="table">
+                <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
                 <div class="row gy-4">
                   <div class="col-md-6">
                     <input type="text" name="name" class="form-control" placeholder="<?php esc_attr_e('Your Name', 'portfoliotheme'); ?>" required>
@@ -497,6 +498,9 @@ $skills = [
                     <button type="submit"><?php esc_html_e('Send Message', 'portfoliotheme'); ?></button>
                   </div>
                 </div>
+                <div class="loading" role="status" aria-live="polite"><?php esc_html_e('Sending message...', 'portfoliotheme'); ?></div>
+                <div class="error-message" role="alert"></div>
+                <div class="sent-message" role="status" aria-live="polite"><?php esc_html_e('Thanks, your message was sent. I will get back to you soon.', 'portfoliotheme'); ?></div>
               </form>
               <?php
           }
