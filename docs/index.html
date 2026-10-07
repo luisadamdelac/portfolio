@@ -404,6 +404,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
     <p>Let’s discuss your next project.</p>
   </div>
   <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div id="contact-form-success" class="alert alert-success d-none" role="status">Thanks, your message was sent. I will get back to you soon.</div>
             <div class="row gy-4">
       <div class="col-lg-5">
         <div class="info-wrap">
@@ -433,9 +434,11 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
       <div class="col-lg-7">
         <div class="form-wrapper" data-aos="fade-up" data-aos-delay="200">
-                        <form class="php-email-form" action="http://localhost/myPortfolio/wp-admin/admin-post.php" method="post" novalidate>
-                <input type="hidden" name="action" value="portfoliotheme_contact_form">
-                <input type="hidden" id="portfoliotheme_contact_nonce" name="portfoliotheme_contact_nonce" value="9415226f0b"><input type="hidden" name="_wp_http_referer" value="/myPortfolio/">                <div class="row gy-4">
+                        <form class="php-email-form" action="https://formsubmit.co/luisadamdelacruz8@gmail.com" method="post">
+                <input type="hidden" name="_subject" value="New portfolio contact message">
+                <input type="hidden" name="_next" value="https://luisadamdelac.github.io/portfolio/?contact_status=success#contact-form-success">
+                <input type="hidden" name="_template" value="table">
+                <div class="row gy-4">
                   <div class="col-md-6">
                     <input type="text" name="name" class="form-control" placeholder="Your Name" required>
                   </div>

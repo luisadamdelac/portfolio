@@ -273,4 +273,8 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+  if (new URLSearchParams(window.location.search).get('contact_status') === 'success') {
+    document.querySelector('#contact-form-success')?.classList.remove('d-none');
+  }
+
 })();

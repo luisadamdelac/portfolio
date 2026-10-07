@@ -431,9 +431,8 @@ $skills = [
     <p><?php _e('Let’s discuss your next project.', 'portfoliotheme'); ?></p>
   </div>
   <div class="container" data-aos="fade-up" data-aos-delay="100">
-    <?php if ($contact_status === 'success') : ?>
-      <div class="alert alert-success" role="status"><?php _e('Thanks, your message was sent. I will get back to you soon.', 'portfoliotheme'); ?></div>
-    <?php elseif ($contact_status === 'error') : ?>
+    <div id="contact-form-success" class="alert alert-success<?php echo $contact_status === 'success' ? '' : ' d-none'; ?>" role="status"><?php _e('Thanks, your message was sent. I will get back to you soon.', 'portfoliotheme'); ?></div>
+    <?php if ($contact_status === 'error') : ?>
       <div class="alert alert-danger" role="status"><?php echo esc_html($contact_flash !== '' ? $contact_flash : __('Sorry, something went wrong. Please try again.', 'portfoliotheme')); ?></div>
     <?php endif; ?>
     <?php if ($contact_page && trim((string) $contact_page->post_content) !== '') : ?>
@@ -477,9 +476,10 @@ $skills = [
               echo do_shortcode('[contact-form-7 id="1" title="Contact form 1"]');
           } else {
               ?>
-              <form class="php-email-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" novalidate>
-                <input type="hidden" name="action" value="portfoliotheme_contact_form">
-                <?php wp_nonce_field('portfoliotheme_contact_form', 'portfoliotheme_contact_nonce'); ?>
+              <form class="php-email-form" action="<?php echo esc_url('https://formsubmit.co/' . $contact_email); ?>" method="post">
+                <input type="hidden" name="_subject" value="New portfolio contact message">
+                <input type="hidden" name="_next" value="https://luisadamdelac.github.io/portfolio/?contact_status=success#contact-form-success">
+                <input type="hidden" name="_template" value="table">
                 <div class="row gy-4">
                   <div class="col-md-6">
                     <input type="text" name="name" class="form-control" placeholder="<?php esc_attr_e('Your Name', 'portfoliotheme'); ?>" required>
