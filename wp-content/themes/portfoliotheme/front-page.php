@@ -476,11 +476,9 @@ $skills = [
               echo do_shortcode('[contact-form-7 id="1" title="Contact form 1"]');
           } else {
               ?>
-              <form class="php-email-form" action="<?php echo esc_url('https://formsubmit.co/' . $contact_email); ?>" method="post">
-                <input type="hidden" name="_subject" value="New portfolio contact message">
-                <input type="hidden" name="_next" value="https://luisadamdelac.github.io/portfolio/?contact_status=success#contact-form-success">
-                <input type="hidden" name="_template" value="table">
-                <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
+              <form class="php-email-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+                <input type="hidden" name="action" value="portfoliotheme_contact_form">
+                <?php wp_nonce_field('portfoliotheme_contact_form', 'portfoliotheme_contact_nonce'); ?>
                 <div class="row gy-4">
                   <div class="col-md-6">
                     <input type="text" name="name" class="form-control" placeholder="<?php esc_attr_e('Your Name', 'portfoliotheme'); ?>" required>

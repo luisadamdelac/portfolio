@@ -92,6 +92,40 @@ function portfoliotheme_scripts() {
 add_action('wp_enqueue_scripts', 'portfoliotheme_scripts');
 
 /**
+ * Configure SMTP mail delivery for the portfolio contact form.
+ *
+ * Fill the SMTP constants in wp-config.php before testing.
+ */
+function portfoliotheme_configure_smtp($phpmailer) {
+    $host = defined('PORTFOLIOTHEME_SMTP_HOST') ? PORTFOLIOTHEME_SMTP_HOST : '';
+    $username = defined('PORTFOLIOTHEME_SMTP_USERNAME') ? PORTFOLIOTHEME_SMTP_USERNAME : '';
+
+    if (empty($host) || empty($username)) {
+        return;
+    }
+
+    $phpmailer->isSMTP();
+    $phpmailer->Host = $host;
+    $phpmailer->Port = defined('PORTFOLIOTHEME_SMTP_PORT') ? (int) PORTFOLIOTHEME_SMTP_PORT : 587;
+    $phpmailer->SMTPSecure = defined('PORTFOLIOTHEME_SMTP_SECURE') ? PORTFOLIOTHEME_SMTP_SECURE : 'tls';
+    $phpmailer->SMTPAuth = true;
+    $phpmailer->Username = $username;
+    $phpmailer->Password = defined('PORTFOLIOTHEME_SMTP_PASSWORD') ? PORTFOLIOTHEME_SMTP_PASSWORD : '';
+
+    $from_email = defined('PORTFOLIOTHEME_SMTP_FROM') && !empty(PORTFOLIOTHEME_SMTP_FROM)
+        ? PORTFOLIOTHEME_SMTP_FROM
+        : get_bloginfo('admin_email');
+    $from_name = defined('PORTFOLIOTHEME_SMTP_FROM_NAME') && !empty(PORTFOLIOTHEME_SMTP_FROM_NAME)
+        ? PORTFOLIOTHEME_SMTP_FROM_NAME
+        : get_bloginfo('name');
+
+    $phpmailer->From = sanitize_email($from_email);
+    $phpmailer->FromName = $from_name;
+    $phpmailer->SMTPDebug = 0;
+}
+add_action('phpmailer_init', 'portfoliotheme_configure_smtp');
+
+/**
  * Register Portfolio custom post type
  */
 function portfoliotheme_register_portfolio_cpt() {
@@ -654,18 +688,51 @@ function portfoliotheme_handle_contact_form() {
     }
 
     $subject  = $subject !== '' ? $subject : __('New message from your portfolio', 'portfoliotheme');
-    $lines    = [
-        __('You received a new message from your portfolio contact form:', 'portfoliotheme'),
-        '',
-        'Name: ' . $name,
-        'Email: ' . $email,
-        'Subject: ' . $subject,
-        'Message:',
-        $message,
-    ];
-    $body = implode("\n", $lines);
+    $site_name = get_bloginfo('name');
+    $site_url  = home_url('/');
 
-    $headers = [];
+    $body = '
+    <div style="font-family: Arial, Helvetica, sans-serif; background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%); padding: 32px 20px; color: #111827;">
+      <div style="max-width: 720px; margin: 0 auto; background: #ffffff; border: 1px solid #dfe7f5; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);">
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%); padding: 28px 32px;">
+          <div style="font-size: 12px; line-height: 1.4; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.75); margin: 0 0 8px;">Portfolio Message</div>
+          <h2 style="margin: 0; font-size: 28px; line-height: 1.2; color: #ffffff; font-weight: 700;">' . esc_html($site_name) . '</h2>
+        </div>
+
+        <div style="padding: 30px 32px 10px;">
+          <p style="margin: 0 0 22px; font-size: 15px; line-height: 1.7; color: #374151;">
+            You received a new message from your portfolio contact form.
+          </p>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; font-size: 15px; line-height: 1.6;">
+            <tr>
+              <td style="padding: 14px 12px; border-bottom: 1px solid #e5e7eb; width: 130px; font-weight: 700; color: #0f172a; vertical-align: top;">Name</td>
+              <td style="padding: 14px 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937; vertical-align: top;">' . esc_html($name) . '</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 700; color: #0f172a; vertical-align: top;">Email</td>
+              <td style="padding: 14px 12px; border-bottom: 1px solid #e5e7eb; color: #1d4ed8; vertical-align: top;">' . esc_html($email) . '</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 700; color: #0f172a; vertical-align: top;">Subject</td>
+              <td style="padding: 14px 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937; vertical-align: top;">' . esc_html($subject) . '</td>
+            </tr>
+          </table>
+
+          <div style="margin: 26px 0 18px; padding: 20px 22px; background: #f8fafc; border-left: 4px solid #2563eb; border-radius: 12px;">
+            <div style="font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: #475569; margin: 0 0 10px; font-weight: 700;">Message</div>
+            <div style="font-size: 15px; line-height: 1.8; color: #1f2937; white-space: pre-wrap;">' . nl2br(esc_html($message)) . '</div>
+          </div>
+        </div>
+
+        <div style="padding: 0 32px 26px; font-size: 12px; color: #64748b;">
+          Sent from <a href="' . esc_url($site_url) . '" style="color: #1d4ed8; text-decoration: none; font-weight: 700;">' . esc_html($site_url) . '</a>
+        </div>
+      </div>
+    </div>
+    ';
+
+    $headers = ['Content-Type: text/html; charset=UTF-8'];
     $from_email = sanitize_email(get_bloginfo('admin_email'));
     if ($from_email) {
         $headers[] = 'From: ' . get_bloginfo('name') . ' <' . $from_email . '>';
